@@ -28,7 +28,7 @@ model = ResidualNet()
 run_model(model, train_loader, test_loader, draw=False, save=True, savefile="ResidualNet_Single")
 
 
-train_loaders, test_loader = get_loaders_committee()
+train_loaders, test_loader = get_loaders_committee(BATCH_SIZE, COMMITTEE_SIZE)
 
 models = [SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
 run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Committee")

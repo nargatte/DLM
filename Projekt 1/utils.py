@@ -15,7 +15,7 @@ from AUC import AUC
 
 
 import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"         # bez tego wysadza kernel kiedy rysuje obrazek
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"        # bez tego wysadza kernel kiedy rysuje obrazek
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"  # potrzebne dla deterministycznego działania
 
 
@@ -52,7 +52,7 @@ classes = [
     "truck"
 ]
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(f"Device used is {device}")
 
 
