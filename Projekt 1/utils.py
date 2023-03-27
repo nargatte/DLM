@@ -1,10 +1,12 @@
 import torch
 import seaborn as sns
 import matplotlib.pyplot as plt
+import random
 
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler
 from torchvision import datasets, transforms
+import torchvision.transforms.functional as TF
 
 from ignite.engine import Events, create_supervised_trainer, create_supervised_evaluator
 from ignite.metrics import Accuracy, Loss
@@ -39,6 +41,31 @@ def get_loaders_committee(batch_size, committee_size):
     test_loader = DataLoader(test_data, batch_size=batch_size)
 
     return train_loaders, test_loader
+
+def augmentation(image):
+    transform_type = random.randint(1, 4)
+    if transform_type == 1:
+        angle = random.randint(-30, 30)
+        image = TF.rotate(image, angle)
+    elif transform_type == 2:
+        image = TF.hflip(image)
+    elif transform_type == 3:
+        image = TF.gaussian_blur(image, (3,3), (1.5, 1.5))
+    elif transform_type == 4:
+        image = TF.equalize(image)
+    return TF.to_tensor(image)
+
+def get_loaders_augmented(batch_size):
+    train_data = datasets.CIFAR10("./cifar10", download=True, transform=transforms.ToTensor(), train=True)
+    test_data = datasets.CIFAR10("./cifar10", download=True, transform=transforms.ToTensor(), train=False)
+
+    train_data_augmented = datasets.CIFAR10("./cifar10", download=True, transform=augmentation, train=True)
+    train_data_concat = torch.utils.data.ConcatDataset([train_data,train_data_augmented])
+
+    train_loader = DataLoader(train_data_concat, shuffle=True, batch_size=batch_size)
+    test_loader = DataLoader(test_data, shuffle=True, batch_size=batch_size)
+
+    return train_loader, test_loader
 
 
 classes = [

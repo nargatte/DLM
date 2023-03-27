@@ -45,3 +45,9 @@ run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="
 
 model = [ResidualNet() for _ in range(COMMITTEE_SIZE)]
 run_model(model, train_loader, test_loader, draw=False, save=True, savefile="ResidualNet_Single")
+
+
+train_loader, test_loader = get_loaders_augmented(BATCH_SIZE*2)
+
+model = SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10])
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Augmented", run_id=RUN_ID)
