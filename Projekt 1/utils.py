@@ -93,7 +93,7 @@ class Committee(nn.Module):
 
     def forward(self, x):
         predictions = torch.stack([model.forward(x).argmax(1) for model in self.models])
-        predictions = torch.stack([predictions[:, i].bincount(minlength=10) for i in range(x.shape[0])]).float()
+        predictions = torch.stack([predictions[:, i].to("cpu").bincount(minlength=10).to(device) for i in range(x.shape[0])]).float()
         return predictions
 
 
@@ -267,7 +267,7 @@ def run_models(models, train_loaders, test_loader, device=device, draw=True, sav
         "accuracy": Accuracy(device=device),
         "loss": Loss(loss_fn, device=device),
         "auc": AUC(softmax_output_transform, device=device),
-        "confusion_matrix": ConfusionMatrix(10, device=device)
+        "confusion_matrix": ConfusionMatrix(10, device=device, output_transform=to_cpy_output_transform)
     }
     evaluator = create_supervised_evaluator(committee, metrics=val_metrics, device=device)
 
