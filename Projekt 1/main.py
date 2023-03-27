@@ -32,7 +32,7 @@ run_model(model, train_loader, test_loader, draw=False, save=True, savefile="Sim
 print()
 
 print("model PoolingNet_Single")
-model = PoolingNet([3, 6, 16, 32], [3, 3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10])
+model = PoolingNet([3, 6, 16, 32], [3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10])
 run_model(model, train_loader, test_loader, draw=False, save=True, savefile="PoolingNet_Single", run_id=RUN_ID)
 print()
 
@@ -60,7 +60,7 @@ run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="
 print()
 
 print("model PoolingNet_Committee")
-models = [PoolingNet([3, 6, 16, 32], [3, 3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+models = [PoolingNet([3, 6, 16, 32], [3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10]) for _ in range(COMMITTEE_SIZE)]
 run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="PoolingNet_Committee", run_id=RUN_ID)
 print()
 
@@ -87,7 +87,7 @@ run_model(model, train_loader, test_loader, draw=False, save=True, savefile="Sim
 print()
 
 print("model PoolingNet_Augmented")
-model = PoolingNet([3, 6, 16, 32], [3, 3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10])
+model = PoolingNet([3, 6, 16, 32], [3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10])
 run_model(model, train_loader, test_loader, draw=False, save=True, savefile="PoolingNet_Augmented", run_id=RUN_ID)
 print()
 
