@@ -1,7 +1,6 @@
 import torch
 import seaborn as sns
 import matplotlib.pyplot as plt
-import random
 
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler
@@ -43,15 +42,17 @@ def get_loaders_committee(batch_size, committee_size):
     return train_loaders, test_loader
 
 def augmentation(image):
-    transform_type = random.randint(1, 4)
+    transform_type = int(torch.randint(1, 6, (1, 1)))
     if transform_type == 1:
-        angle = random.randint(-30, 30)
+        angle = int(torch.randint(1, 180, (1, 1)))
         image = TF.rotate(image, angle)
     elif transform_type == 2:
         image = TF.hflip(image)
     elif transform_type == 3:
-        image = TF.gaussian_blur(image, (3,3), (1.5, 1.5))
+        image = TF.vflip(image)
     elif transform_type == 4:
+        image = TF.gaussian_blur(image, (3, 3), (1.5, 1.5))
+    elif transform_type == 5:
         image = TF.equalize(image)
     return TF.to_tensor(image)
 
