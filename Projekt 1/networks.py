@@ -36,10 +36,10 @@ class PoolingNet(nn.Module):
         self.convs = nn.ModuleList()
         for i in range(len(kernel_sizes)):
             if pools[i]:
-                self.convs.append(nn.Sequential([
+                self.convs.append(nn.Sequential(
                     nn.Conv2d(conv_channels[i], conv_channels[i + 1], kernel_sizes[i]),
                     nn.MaxPool2d(2, 2)
-                ]))
+                ))
             else:
                 self.convs.append(nn.Conv2d(conv_channels[i], conv_channels[i + 1], kernel_sizes[i]))
 
