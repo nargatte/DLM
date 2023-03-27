@@ -10,6 +10,7 @@ from ignite.engine import Events, create_supervised_trainer, create_supervised_e
 from ignite.metrics import Accuracy, Loss
 from ignite.metrics.confusion_matrix import ConfusionMatrix
 from ignite.handlers import EarlyStopping
+from ignite.contrib.handlers import TensorboardLogger, global_step_from_engine
 
 from AUC import AUC
 
@@ -94,7 +95,7 @@ def to_cpy_output_transform(output):
     return y_pred.to("cpu"), y.to("cpu")
 
 
-def run_model(model, train_loader, test_loader, device=device, draw=True, save=False, savefile=""):
+def run_model(model, train_loader, test_loader, device=device, draw=True, save=False, savefile="", run_id=""):
     model.to(device)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -129,10 +130,32 @@ def run_model(model, train_loader, test_loader, device=device, draw=True, save=F
         metrics = engine.state.metrics
         return metrics["accuracy"]
     
+    tb_logger = TensorboardLogger(log_dir=f"tb-logger/{run_id}/{savefile}")
 
+    layout = {
+        "multiline": {
+            "loss": ["Multiline", ["training/loss", "validation/loss"]],
+            "accuracy": ["Multiline", ["training/accuracy", "validation/accuracy"]],
+            "auc": ["Multiline", ["training/auc", "validation/auc"]],
+        },
+    }
+    tb_logger.add_custom_scalars(layout)
+
+    for tag, evaluator in [("training", train_evaluator), ("validation", val_evaluator)]:
+        tb_logger.attach_output_handler(
+            evaluator,
+            event_name=Events.EPOCH_COMPLETED,
+            tag=tag,
+            metric_names=["accuracy", "loss", "auc"],
+            global_step_transform=global_step_from_engine(trainer),
+        )
+    
     val_evaluator.add_event_handler(Events.COMPLETED, EarlyStopping(3, score_function, trainer))
 
     trainer.run(train_loader, max_epochs=100)
+
+    tb_logger.close()
+
     plot_confusion_matrix(val_evaluator.state.metrics["confusion_matrix"], draw, save, savefile)
 
 
