@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# in order to run tensorboard:
+#tensorboard --logdir=tb-logger/ --host localhost --port 8088
 
 import torch
 import datetime
