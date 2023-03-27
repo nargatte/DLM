@@ -215,7 +215,7 @@ def run_model(model, train_loader, test_loader, device=device, draw=True, save=F
 
     plot_confusion_matrix(val_evaluator.state.metrics["confusion_matrix"], draw, save, savefile)
 
-def run_models(models, train_loaders, test_loader, device=device, draw=True, save=False, savefile=""):
+def run_models(models, train_loaders, test_loader, device=device, draw=True, save=False, savefile="", run_id=""):
     assert len(models) == len(train_loaders), "Number of models and number of train_loaders should be equal"
 
     for i, model in enumerate(models):
@@ -255,7 +255,8 @@ def run_models(models, train_loaders, test_loader, device=device, draw=True, sav
 
 
         val_evaluator.add_event_handler(Events.COMPLETED, EarlyStopping(3, score_function, trainer))
-        trainer.run(train_loaders[i], max_epochs=100)
+        with create_tensorboard_logger(savefile+"/"+str(i), run_id, trainer, train_evaluator, val_evaluator, model) as tb_logger:
+            trainer.run(train_loaders[i], max_epochs=100)
 
 
     committee = Committee(models)
