@@ -1,95 +1,43 @@
 #!/usr/bin/env python3
 
 import torch
-import torchvision
-import matplotlib.pyplot as plt
-import numpy as np
 
-import torch.nn.functional as F
-
-from torch import nn, optim
-from torchvision import datasets, transforms
+from utils import *
+from networks import *
 
 
-class Net(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.conv3 = nn.Conv2d(16, 32, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        # self.fc1 = nn.Linear(16 * 5 * 5, 120)
-        self.fc1 = nn.Linear(32 * 20 * 20, 120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 10)
+torch.use_deterministic_algorithms(True)
+torch.manual_seed(0)
 
-    def forward(self, x):
-        # x = self.pool(F.relu(self.conv1(x)))
-        # x = self.pool(F.relu(self.conv2(x)))
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = torch.flatten(x, 1)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+BATCH_SIZE = 64
+COMMITTEE_SIZE = 5
 
 
-classes = {
-    0: "plane",
-    1: "car",
-    2: "bird",
-    3: "cat",
-    4: "deer",
-    5: "dog",
-    6: "frog",
-    7: "horse",
-    8: "ship",
-    9: "truck"
-}
+train_loader, test_loader = get_loaders_single_model(BATCH_SIZE)
+
+model = SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10])
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Single")
+
+model = SimpleNet([3, 6, 16, 32, 64], [3, 3, 3, 3], [64 * 16 * 16, 120, 84, 32, 10])
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_3_Single")
+
+model = PoolingNet([3, 6, 16, 32], [3, 3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10])
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="PoolingNet_Single")
+
+model = ResidualNet()
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="ResidualNet_Single")
 
 
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
+train_loaders, test_loader = get_loaders_committee()
 
+models = [SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Committee")
 
-batch_size = 5
-transform = transforms.Compose([
-    transforms.ToTensor()  # this includes scaling to [0, 1]
-])
+models = [SimpleNet([3, 6, 16, 32, 64], [3, 3, 3, 3], [64 * 16 * 16, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_3_Committee")
 
-cifar10_data = datasets.CIFAR10("./cifar10", download=True, transform=transform)
-data_loader = torch.utils.data.DataLoader(cifar10_data, shuffle=True, batch_size=batch_size)
+models = [PoolingNet([3, 6, 16, 32], [3, 3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="PoolingNet_Committee")
 
-# for images, labels in data_loader:
-#     imshow(torchvision.utils.make_grid(images))
-#     print(' '.join(f'{classes[int(labels[j])]:5s}' for j in range(batch_size)))
-#     break
-
-net = Net()
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(net.parameters())
-
-epoch_count = 5
-
-for epoch in range(epoch_count):
-    running_loss = 0.0
-    for i, data in enumerate(data_loader):
-        images, labels = data
-
-        optimizer.zero_grad()
-
-        prediction = net(images)
-        loss = criterion(prediction, labels)
-        loss.backward()
-        optimizer.step()
-
-        running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
-            running_loss = 0.0
+model = [ResidualNet() for _ in range(COMMITTEE_SIZE)]
+run_model(model, train_loader, test_loader, draw=False, save=True, savefile="ResidualNet_Single")
