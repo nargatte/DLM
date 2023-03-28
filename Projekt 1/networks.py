@@ -59,6 +59,7 @@ class PoolingNet(nn.Module):
         return x
 
 
+# based on https://medium.com/analytics-vidhya/resnet-10f4ef1b9d4c
 class ResidualNet(nn.Module):
     def __init__(self):
         super().__init__()

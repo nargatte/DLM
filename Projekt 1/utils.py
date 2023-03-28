@@ -61,7 +61,7 @@ def get_loaders_augmented(batch_size):
     test_data = datasets.CIFAR10("./cifar10", download=True, transform=transforms.ToTensor(), train=False)
 
     train_data_augmented = datasets.CIFAR10("./cifar10", download=True, transform=augmentation, train=True)
-    train_data_concat = torch.utils.data.ConcatDataset([train_data,train_data_augmented])
+    train_data_concat = torch.utils.data.ConcatDataset([train_data, train_data_augmented])
 
     train_loader = DataLoader(train_data_concat, shuffle=True, batch_size=batch_size)
     test_loader = DataLoader(test_data, shuffle=True, batch_size=batch_size)

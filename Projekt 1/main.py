@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # in order to run tensorboard:
-#tensorboard --logdir=tb-logger/ --host localhost --port 8088
+# tensorboard --logdir=tb-logger/ --host localhost --port 8088
 
 import torch
 import datetime
@@ -56,31 +56,31 @@ RUN_ID = datetime.datetime.now().strftime("%Y.%m.%d %H.%M")
 torch.manual_seed(0)
 train_loaders, test_loader = get_loaders_committee(BATCH_SIZE, COMMITTEE_SIZE)
 
-print("model SimpleNet_kernel_5_Committee")
-torch.manual_seed(0)
-models = [SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
-run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Committee", run_id=RUN_ID)
-print()
+# print("model SimpleNet_kernel_5_Committee")
+# torch.manual_seed(0)
+# models = [SimpleNet([3, 6, 16, 32, 64], [5, 5, 5, 5], [64 * 16 * 16, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+# run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_5_Committee", run_id=RUN_ID)
+# print()
 
-print("model SimpleNet_kernel_3_Committee")
-torch.manual_seed(0)
-models = [SimpleNet([3, 6, 16, 32, 64], [3, 3, 3, 3], [64 * 24 * 24, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
-run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_3_Committee", run_id=RUN_ID)
-print()
+# print("model SimpleNet_kernel_3_Committee")
+# torch.manual_seed(0)
+# models = [SimpleNet([3, 6, 16, 32, 64], [3, 3, 3, 3], [64 * 24 * 24, 120, 84, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+# run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="SimpleNet_kernel_3_Committee", run_id=RUN_ID)
+# print()
 
-print("model PoolingNet_Committee")
-torch.manual_seed(0)
-models = [PoolingNet([3, 6, 16, 32], [3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10]) for _ in range(COMMITTEE_SIZE)]
-run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="PoolingNet_Committee", run_id=RUN_ID)
-print()
+# print("model PoolingNet_Committee")
+# torch.manual_seed(0)
+# models = [PoolingNet([3, 6, 16, 32], [3, 3, 3], [True, True, False], [32 * 4 * 4, 120, 84, 64, 32, 10]) for _ in range(COMMITTEE_SIZE)]
+# run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="PoolingNet_Committee", run_id=RUN_ID)
+# print()
 
-print("model ResidualNet_Single")
+print("model ResidualNet_Committee")
 torch.manual_seed(0)
 models = [ResidualNet() for _ in range(COMMITTEE_SIZE)]
 run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="ResidualNet_Committee", run_id=RUN_ID)
 print()
 
-print("model InceptionNet_Single")
+print("model InceptionNet_Committee")
 torch.manual_seed(0)
 models = [InceptionNet() for _ in range(COMMITTEE_SIZE)]
 run_models(models, train_loaders, test_loader, draw=False, save=True, savefile="InceptionNet_Committee", run_id=RUN_ID)
