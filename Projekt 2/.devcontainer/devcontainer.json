@@ -1,0 +1,5 @@
+{
+	"name": "tf-proj2",
+	"image": "tensorflow/tensorflow:latest-gpu",
+	"runArgs": ["--gpus", "all"]
+}
