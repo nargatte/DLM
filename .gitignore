@@ -3,3 +3,4 @@ cifar10
 cifar100
 plots
 tb-logger
+tf_cache
