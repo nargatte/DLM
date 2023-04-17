@@ -23,7 +23,7 @@ def _apply_after_cache_decorators_(tf_dataset, split):
 
     tf_dataset = tf_dataset.cache(CACHE_PATH+split)
 
-    if split == "test":
+    if split == "train":
         tf_dataset = tf_dataset.shuffle(10000)
 
     tf_dataset = tf_dataset.prefetch(tf.data.AUTOTUNE)
