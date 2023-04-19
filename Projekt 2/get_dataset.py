@@ -14,7 +14,7 @@ def _load_from_cache_(split): # I wish it was simpler
         yield 1
 
     new_ds = tf.data.Dataset.from_generator(empty_gen, output_signature=(
-            tf.TensorSpec(shape=(61, 101), dtype=tf.float32),
+            tf.TensorSpec(shape=(124, 129), dtype=tf.float32), # Need to change here when shape was changed
             tf.TensorSpec(shape=(), dtype=tf.int32)))
 
     return _apply_after_cache_decorators_(new_ds, split)
@@ -69,14 +69,14 @@ def get_dataset(split = "test"):
         tf.TensorSpec(shape=(), dtype=tf.int32)))
 
     def resample(audio):
-        return tf.reduce_mean(tf.reshape(audio, (4000, -1)), axis=1)
+        return tf.reduce_mean(tf.reshape(audio, (8000, -1)), axis=1)
 
     # Perhaps resimpling is not necessary wheny we can manipulate frame lenght
     def fourier_transform(audio):
-        return tf.abs(tf.signal.stft(audio, frame_length=128, frame_step=64, fft_length=200))
+        return tf.abs(tf.signal.stft(audio, frame_length=255, frame_step=128))
 
     tf_dataset = tf_dataset.map(
-        lambda audio,label: (fourier_transform(resample(audio)), label),
+        lambda audio,label: (fourier_transform(audio), label),
         num_parallel_calls=tf.data.AUTOTUNE)
 
     # This monster makes caching a toure
