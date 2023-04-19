@@ -5,6 +5,7 @@ import numpy as np
 import math as m
 from tensorflow.keras import layers
 import os
+import random
 
 # Remove this folder when making changes in this file
 CACHE_PATH = "./tf_cache/"
@@ -38,7 +39,7 @@ def get_dataset(split = "test"):
 
     dataset = load_dataset("speech_commands", "v0.01", split=split)
 
-    def ds_gen():
+    def ds_gen_train():
         for record in dataset:
             x = record["audio"]["array"]
             y = record["label"]
@@ -53,16 +54,41 @@ def get_dataset(split = "test"):
             if y == 30:
                 y = 11 #set silence
 
-            if x_len > 16000:
-                xs = np.array_split(x, m.ceil(x_len/16000))
-            else:
-                xs = [x]
+            # Stupid subsampling for the biggest of classes 
+            # (average_class_size / biggest_class_size)
+            if y == 10 and random.random() > (1853 / 32550):
+                continue
 
-            for a in xs:
-                if a.shape[0] < 16000:
-                    yield (np.append(a, [0]*(16000 - a.shape[0])), y)
-                else:
-                    yield (a, y)
+            if x_len < 16000:
+                yield (np.append(x, [0]*(16000 - x_len)), y)
+            elif x_len == 16000:
+                yield (x, y)
+            else: 
+                #Slightly less stupid oversampling for the smallest of classes
+                part_proportion = x_len / 5411883 # sum of all silence
+                part_count = 1853 * part_proportion
+                for _ in range(int(part_count)):
+                    start = random.randint(0, x_len - 16000 - 1)
+                    stop = start + 16000
+                    yield (x[start:stop], y)
+
+    def ds_gen_test():
+        for record in dataset:
+            x = record["audio"]["array"]
+            y = record["label"]
+            x_len = x.shape[0]
+
+            if 10 <= y < 30:
+                y = 10 #set others
+            if y == 30:
+                y = 11 #set silence
+
+            yield (x, y)
+
+    if split == "test":
+        ds_gen = ds_gen_test
+    else:
+        ds_gen = ds_gen_train
 
     tf_dataset = tf.data.Dataset.from_generator(ds_gen, output_signature=(
         tf.TensorSpec(shape=(16000,), dtype=tf.float64),
@@ -100,7 +126,7 @@ def get_categories():
         if k < 10:
             my_categories[k] = v
             
-    my_categories[10] = "others"
+    my_categories[10] = "other"
     my_categories[11] = "silence"
 
     return my_categories
