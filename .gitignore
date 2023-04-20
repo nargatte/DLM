@@ -4,3 +4,4 @@ cifar100
 plots
 tb-logger
 tf_cache
+saved_models
