@@ -1,4 +1,0 @@
-* Install Docker
-* Install Nvidia Docker Support: https://github.com/NVIDIA/nvidia-docker
-* Install "Dev Containers" Extension for VS Code
-* In VS Code: click >< on bottom left and "Reopen in Container"
